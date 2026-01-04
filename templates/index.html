@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoJudge - Programming Problem Difficulty Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-predict {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-predict:active {
+            transform: translateY(0);
+        }
+
+        .btn-predict:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .class-easy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .class-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .class-hard {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .score-value {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .confidence {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .confidence-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease-out;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AutoJudge</h1>
+            <p>Predict Programming Problem Difficulty Automatically</p>
+        </div>
+
+        <div class="content">
+            <form id="problemForm">
+                <div class="form-group">
+                    <label for="title">Problem Title</label>
+                    <input type="text" id="title" name="title" placeholder="Enter problem title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Problem Description</label>
+                    <textarea id="description" name="description" placeholder="Enter the full problem description..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="input_description">Input Description</label>
+                    <textarea id="input_description" name="input_description" placeholder="Describe the input format..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="output_description">Output Description</label>
+                    <textarea id="output_description" name="output_description" placeholder="Describe the expected output..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-predict" id="predictBtn">
+                    🔮 Predict Difficulty
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #666;">Analyzing problem...</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="results" id="results">
+                <div class="result-item">
+                    <div class="result-label">Predicted Difficulty Class:</div>
+                    <div class="result-value" id="predictedClass"></div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Predicted Difficulty Score:</div>
+                    <div class="result-value score-value" id="predictedScore"></div>
+                </div>
+
+                <div class="confidence">
+                    <div class="result-label">Confidence Levels:</div>
+                    <div id="confidenceContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('problemForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const predictBtn = document.getElementById('predictBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const error = document.getElementById('error');
+
+            // Hide previous results and errors
+            results.classList.remove('show');
+            error.classList.remove('show');
+
+            // Show loading
+            loading.classList.add('show');
+            predictBtn.disabled = true;
+
+            // Get form data
+            const formData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                input_description: document.getElementById('input_description').value,
+                output_description: document.getElementById('output_description').value
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Display predicted class
+                    const classElement = document.getElementById('predictedClass');
+                    classElement.textContent = data.predicted_class;
+                    classElement.className = 'result-value class-' + data.predicted_class.toLowerCase();
+
+                    // Display predicted score
+                    document.getElementById('predictedScore').textContent = data.predicted_score;
+
+                    // Display confidence levels
+                    const confidenceContainer = document.getElementById('confidenceContainer');
+                    confidenceContainer.innerHTML = '';
+
+                    for (const [cls, conf] of Object.entries(data.confidence)) {
+                        const percentage = (conf * 100).toFixed(1);
+                        const item = document.createElement('div');
+                        item.className = 'confidence-item';
+                        item.innerHTML = `
+                            <strong>${cls}:</strong> ${percentage}%
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        `;
+                        confidenceContainer.appendChild(item);
+                    }
+
+                    // Show results
+                    results.classList.add('show');
+                } else {
+                    error.textContent = 'Error: ' + data.error;
+                    error.classList.add('show');
+                }
+            } catch (err) {
+                error.textContent = 'Failed to connect to server. Please make sure the Flask app is running.';
+                error.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+                predictBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
