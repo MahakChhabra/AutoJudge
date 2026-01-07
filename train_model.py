@@ -42,6 +42,11 @@ df['description'] = df['description'].fillna('')
 df['input_description'] = df['input_description'].fillna('')
 df['output_description'] = df['output_description'].fillna('')
 
+# Keep original class labels (lowercase)
+print(f"\n📊 Classes found: {df['problem_class'].unique()}")
+print(f"📊 Class distribution:")
+print(df['problem_class'].value_counts())
+
 # Combine all text fields
 df['combined_text'] = (
     df['title'] + ' ' + 
@@ -50,7 +55,7 @@ df['combined_text'] = (
     df['output_description']
 )
 
-print(f"Combined text created for {len(df)} problems")
+print(f"\nCombined text created for {len(df)} problems")
 
 # ============================================
 # STEP 3: FEATURE ENGINEERING
