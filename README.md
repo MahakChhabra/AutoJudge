@@ -3,7 +3,7 @@
 > An intelligent machine learning system that automatically predicts the difficulty level (Easy/Medium/Hard) and numerical score (1-10) of competitive programming problems using Natural Language Processing and Ensemble Learning.
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Accuracy](https://img.shields.io/badge/Accuracy-80--85%25-brightgreen.svg)]()
+[![Accuracy](https://img.shields.io/badge/Accuracy-70--75%25-brightgreen.svg)]()
 
 📺 **[Watch Demo Video] | 
 https://drive.google.com/file/d/1fJchppNd-rhxR70jkUU4HQUY8vPzlMZO/view?usp=sharing
