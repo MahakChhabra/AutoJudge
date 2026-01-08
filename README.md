@@ -5,7 +5,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Accuracy](https://img.shields.io/badge/Accuracy-80--85%25-brightgreen.svg)]()
 
-📺 **[Watch Demo Video](#demo-video)** | 📊 **[View Report](REPORT.pdf)**
+📺 **[Watch Demo Video](AutoJudgeDemo.mp4)** | 📊 **[View Report](AutoJudge.pdf)**
 
 ---
 
@@ -231,8 +231,6 @@ Ensure `programming_problems.jsonl` is in the project directory.
 # For best results (15-20 minutes)
 python train_advanced.py
 
-# OR for quick training (2-3 minutes)
-python train_fast.py
 ```
 
 **Step 5: Run Web Application**
